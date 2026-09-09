@@ -1,0 +1,39 @@
+{
+  "specVersion": "1.0",
+  "type": "react",
+  "domain": "insurance",
+  "metadata": { "title": "Insurance Portal" },
+  "entities": [
+    {
+      "name": "Policy",
+      "variableName": "policy",
+      "resourcePath": "policies",
+      "fields": [
+        { "name": "policyNumber", "type": "string" },
+        { "name": "holderName",   "type": "string" },
+        { "name": "type",         "type": "string" },
+        { "name": "premium",      "type": "number" },
+        { "name": "status",       "type": "string" }
+      ]
+    },
+    {
+      "name": "Claim",
+      "variableName": "claim",
+      "resourcePath": "claims",
+      "search": { "fields": ["description"] },
+      "fields": [
+        { "name": "claimNumber", "type": "string" },
+        { "name": "policyId",    "type": "number",
+          "relation": { "type": "many-to-one", "targetModel": "policy", "joinColumn": "policy_id" } },
+        { "name": "description", "type": "string" },
+        { "name": "amount",      "type": "number" },
+        { "name": "status",      "type": "string" }
+      ]
+    }
+  ],
+  "uiComponents": ["statusbadge", "searchinput", "datepicker", "tablefilters", "actionmenu"],
+  "features": {
+    "pagination": { "enabled": true },
+    "search": { "enabled": true }
+  }
+}

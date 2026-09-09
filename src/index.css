@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tabular figures keep money columns aligned down the page. */
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Responsive table -> stacked cards under 640px.
+ *
+ * The markup stays a single semantic <table> at every width; only its display
+ * changes. Row labels come from `content: attr(data-label)`, which lives in a
+ * pseudo-element rather than the DOM, so the accessibility tree and any test
+ * queries see exactly one copy of each value.
+ */
+@media (max-width: 639px) {
+  table[data-responsive='true'] thead {
+    display: none;
+  }
+
+  table[data-responsive='true'],
+  table[data-responsive='true'] tbody,
+  table[data-responsive='true'] tr,
+  table[data-responsive='true'] td {
+    display: block;
+    width: 100%;
+  }
+
+  table[data-responsive='true'] tr {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--color-slate-100, #f1f5f9);
+  }
+
+  table[data-responsive='true'] td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.3rem 0;
+    text-align: right;
+    border: 0;
+  }
+
+  table[data-responsive='true'] td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-slate-500, #64748b);
+    text-align: left;
+  }
+
+  /* The row's primary cell reads as the card title. */
+  table[data-responsive='true'] td[data-primary='true'] {
+    padding-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  table[data-responsive='true'] td[data-primary='true']::before {
+    display: none;
+  }
+
+  table[data-responsive='true'] td[data-primary='true'] {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  /* The action menu floats to the card's top-right corner. */
+  table[data-responsive='true'] tr {
+    position: relative;
+  }
+
+  table[data-responsive='true'] td[data-actions='true'] {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    padding: 0;
+  }
+
+  table[data-responsive='true'] td[data-actions='true']::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
