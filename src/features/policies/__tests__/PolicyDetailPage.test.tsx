@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderRoute } from '@/test/utils'
 import { PolicyDetailPage } from '../pages/PolicyDetailPage'
 import { policyApi } from '../api/policyApi'
+import { claimApi } from '@/features/claims/api/claimApi'
+import type { Claim } from '@/types'
 
 function renderPage(id = 1) {
   return renderRoute(<PolicyDetailPage />, {
@@ -33,6 +35,51 @@ describe('PolicyDetailPage', () => {
 
     // CLM-5002 belongs to policy 2, so it must not leak in.
     expect(screen.queryByText('CLM-5002')).not.toBeInTheDocument()
+  })
+
+  it('shows pagination controls and fetches the next page when there are multiple pages of claims', async () => {
+    const user = userEvent.setup()
+
+    function buildClaims(page: number): Claim[] {
+      return Array.from({ length: 10 }, (_, index) => {
+        const num = (page - 1) * 10 + index + 1
+        return {
+          id: 1000 + num,
+          claimNumber: `CLM-PAGE-${String(num).padStart(3, '0')}`,
+          policyId: 1,
+          description: 'Synthetic paginated claim',
+          amount: 100 + num,
+          status: 'submitted',
+        }
+      })
+    }
+
+    const listSpy = vi.spyOn(claimApi, 'list').mockImplementation(async (params = {}) => {
+      const page = params.page ?? 1
+      return {
+        items: buildClaims(page),
+        total: 15,
+        page,
+        pageSize: params.pageSize ?? 10,
+      }
+    })
+
+    try {
+      renderPage(1)
+
+      expect(await screen.findByText('CLM-PAGE-001')).toBeInTheDocument()
+      expect(screen.getByRole('navigation', { name: 'Pagination' })).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Next' }))
+
+      await waitFor(() => {
+        expect(listSpy).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }))
+      })
+      expect(await screen.findByText('CLM-PAGE-011')).toBeInTheDocument()
+      expect(screen.queryByText('CLM-PAGE-001')).not.toBeInTheDocument()
+    } finally {
+      listSpy.mockRestore()
+    }
   })
 
   it('shows an empty state for a policy with no claims', async () => {

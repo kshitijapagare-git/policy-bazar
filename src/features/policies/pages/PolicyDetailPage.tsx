@@ -1,11 +1,23 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Button, Card, ConfirmDialog, EmptyState, Spinner, StatusBadge } from '@/components/ui'
+import {
+  Button,
+  Card,
+  ConfirmDialog,
+  CrudList,
+  EmptyState,
+  Pagination,
+  Spinner,
+  StatusBadge,
+} from '@/components/ui'
+import type { Column } from '@/components/ui'
 import { useAsync } from '@/hooks/useAsync'
 import { formatCurrency, formatDate, humanize } from '@/lib/formatters'
+import { PAGE_SIZE } from '@/lib/constants'
 import { policyApi } from '../api/policyApi'
 import { claimApi } from '@/features/claims/api/claimApi'
+import type { Claim } from '@/types'
 
 export function PolicyDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -13,9 +25,52 @@ export function PolicyDetailPage() {
   const navigate = useNavigate()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [claimsPage, setClaimsPage] = useState(1)
 
   const { data: policy, loading, error } = useAsync(() => policyApi.get(policyId), [policyId])
-  const { data: claims } = useAsync(() => claimApi.listByPolicy(policyId), [policyId])
+  const { data: claims, loading: claimsLoading } = useAsync(
+    () =>
+      claimApi.list({
+        page: claimsPage,
+        pageSize: PAGE_SIZE,
+        filters: { policyId: String(policyId) },
+        sortBy: 'claimNumber',
+      }),
+    [policyId, claimsPage],
+  )
+
+  const claimColumns = useMemo<Column<Claim>[]>(
+    () => [
+      {
+        key: 'claimNumber',
+        header: 'Claim number',
+        primary: true,
+        render: (claim) => (
+          <Link to={`/claims/${claim.id}`} className="font-medium text-sky-700 hover:underline">
+            {claim.claimNumber}
+          </Link>
+        ),
+      },
+      {
+        key: 'description',
+        header: 'Description',
+        render: (claim) => claim.description,
+      },
+      {
+        key: 'amount',
+        header: 'Amount',
+        align: 'right',
+        numeric: true,
+        render: (claim) => formatCurrency(claim.amount),
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (claim) => <StatusBadge status={claim.status} />,
+      },
+    ],
+    [],
+  )
 
   async function handleDelete() {
     setDeleting(true)
@@ -111,35 +166,22 @@ export function PolicyDetailPage() {
         <h2 className="border-b border-slate-200/80 px-4 py-3.5 text-sm font-semibold text-slate-900 sm:px-6">
           Claims on this policy
         </h2>
-        {claims && claims.length > 0 ? (
-          <ul className="divide-y divide-slate-100">
-            {claims.map((claim) => (
-              <li
-                key={claim.id}
-                className="flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-slate-50/70 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6"
-              >
-                <div className="min-w-0">
-                  <Link
-                    to={`/claims/${claim.id}`}
-                    className="text-sm font-medium text-sky-700 hover:underline"
-                  >
-                    {claim.claimNumber}
-                  </Link>
-                  <p className="mt-0.5 truncate text-xs text-slate-500">{claim.description}</p>
-                </div>
-                <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
-                  <span className="numeric text-sm font-medium text-slate-900">
-                    {formatCurrency(claim.amount)}
-                  </span>
-                  <StatusBadge status={claim.status} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <EmptyState
-            title="No claims yet"
-            message="Claims filed against this policy will appear here."
+        <CrudList
+          caption="Claims on this policy"
+          columns={claimColumns}
+          rows={claims?.items ?? []}
+          getRowKey={(claim) => claim.id}
+          loading={claimsLoading}
+          emptyTitle="No claims yet"
+          emptyMessage="Claims filed against this policy will appear here."
+        />
+
+        {claims && claims.total > 0 && (
+          <Pagination
+            page={claims.page}
+            pageSize={claims.pageSize}
+            total={claims.total}
+            onPageChange={setClaimsPage}
           />
         )}
       </Card>
