@@ -38,6 +38,20 @@ describe('claimApi', () => {
     expect(result.items.map((claim) => claim.claimNumber)).toEqual(['CLM-5004', 'CLM-5008'])
   })
 
+  it('combines search and status filter with AND semantics', async () => {
+    // "replacement" appears in both CLM-5004 (submitted) and CLM-5012 (approved).
+    const both = await claimApi.list({ search: 'replacement', pageSize: 50 })
+    expect(both.items.map((claim) => claim.claimNumber)).toEqual(['CLM-5004', 'CLM-5012'])
+
+    const narrowed = await claimApi.list({
+      search: 'replacement',
+      filters: { status: 'submitted' },
+      pageSize: 50,
+    })
+
+    expect(narrowed.items.map((claim) => claim.claimNumber)).toEqual(['CLM-5004'])
+  })
+
   it('filters by the policyId relation', async () => {
     const result = await claimApi.list({ filters: { policyId: '1' }, pageSize: 50 })
 

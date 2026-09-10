@@ -32,6 +32,24 @@ test('a policy detail page shows its claims', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'CLM-5001' })).toBeVisible()
 })
 
+test('claims list searches by description and filters by status', async ({ page }) => {
+  await page.goto('/claims')
+
+  await expect(page.getByRole('link', { name: 'CLM-5001' })).toBeVisible()
+
+  await page.getByRole('searchbox', { name: 'Search claims' }).fill('luggage')
+  await expect(page.getByRole('link', { name: 'CLM-5006' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'CLM-5001' })).toBeHidden()
+
+  await page.getByRole('searchbox', { name: 'Search claims' }).fill('')
+  await expect(page.getByRole('link', { name: 'CLM-5001' })).toBeVisible()
+
+  await page.getByLabel('Status').selectOption('submitted')
+  await expect(page.getByRole('link', { name: 'CLM-5004' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'CLM-5008' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'CLM-5001' })).toBeHidden()
+})
+
 test('a claim can be created end to end', async ({ page }) => {
   await page.goto('/claims/new')
 

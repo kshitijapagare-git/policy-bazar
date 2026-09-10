@@ -65,6 +65,26 @@ describe('ClaimListPage', () => {
     expect(screen.getByText('CLM-5008')).toBeInTheDocument()
   })
 
+  it('combines search and status filter', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await screen.findByText('CLM-5001')
+    await user.type(screen.getByRole('searchbox', { name: 'Search claims' }), 'replacement')
+
+    await waitFor(() => {
+      expect(screen.getByText('CLM-5004')).toBeInTheDocument()
+      expect(screen.getByText('CLM-5012')).toBeInTheDocument()
+    })
+
+    await user.selectOptions(screen.getByLabelText('Status'), 'submitted')
+
+    await waitFor(() => {
+      expect(screen.getByText('CLM-5004')).toBeInTheDocument()
+      expect(screen.queryByText('CLM-5012')).not.toBeInTheDocument()
+    })
+  })
+
   it('sorts by amount when the column header is clicked', async () => {
     const user = userEvent.setup()
     renderPage()
