@@ -21,6 +21,23 @@ describe('StatusBadge', () => {
     render(<StatusBadge status="mystery" />)
     expect(screen.getByText('Mystery')).toBeInTheDocument()
   })
+
+  it.each([
+    ['active', 'bg-emerald-50'],
+    ['pending', 'bg-amber-50'],
+    ['lapsed', 'bg-slate-100'],
+    ['cancelled', 'bg-rose-50'],
+  ])('maps policy status "%s" to the expected tone class', (status, toneClass) => {
+    render(<StatusBadge status={status} />)
+
+    const badge = screen.getByText(
+      new RegExp(`^${status.charAt(0).toUpperCase()}${status.slice(1)}$`, 'i'),
+    )
+    expect(badge.className).toContain(toneClass)
+    expect(badge.tagName).toBe('SPAN')
+    expect(badge).not.toHaveAttribute('role')
+    expect(badge.closest('button')).toBeNull()
+  })
 })
 
 describe('EmptyState', () => {

@@ -36,8 +36,8 @@ export const STATUS_TONES: Record<string, 'success' | 'warning' | 'danger' | 'in
   pending: 'warning',
   submitted: 'info',
   under_review: 'warning',
-  lapsed: 'danger',
-  cancelled: 'neutral',
+  lapsed: 'neutral',
+  cancelled: 'danger',
   rejected: 'danger',
 }
 

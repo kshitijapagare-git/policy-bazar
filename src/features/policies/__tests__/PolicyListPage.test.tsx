@@ -132,4 +132,26 @@ describe('PolicyListPage', () => {
 
     expect(screen.getByTestId('location')).toHaveTextContent('/policies/new')
   })
+
+  it.each([
+    ['POL-1001', 'Active', 'bg-emerald-50'],
+    ['POL-1003', 'Pending', 'bg-amber-50'],
+    ['POL-1005', 'Lapsed', 'bg-slate-100'],
+    ['POL-1006', 'Cancelled', 'bg-rose-50'],
+  ])(
+    'shows a %s row with a %s badge in the corresponding tone',
+    async (policyNumber, statusLabel, toneClass) => {
+      renderPage()
+
+      const policyCell = await screen.findByText(policyNumber)
+      const row = policyCell.closest('tr')
+      expect(row).not.toBeNull()
+
+      const badge = within(row as HTMLElement).getByText(statusLabel)
+      expect(badge.tagName).toBe('SPAN')
+      expect(badge.className).toContain(toneClass)
+      expect(badge).not.toHaveAttribute('role')
+      expect(badge.closest('button')).toBeNull()
+    },
+  )
 })
