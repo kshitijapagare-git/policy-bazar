@@ -5,6 +5,7 @@ export interface Policy {
   type: string
   premium: number
   status: string
+  renewalDate: string
 }
 
 export interface Claim {

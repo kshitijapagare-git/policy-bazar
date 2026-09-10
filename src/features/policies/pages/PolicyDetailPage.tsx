@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button, Card, ConfirmDialog, EmptyState, Spinner, StatusBadge } from '@/components/ui'
 import { useAsync } from '@/hooks/useAsync'
-import { formatCurrency, humanize } from '@/lib/formatters'
+import { formatCurrency, formatDate, humanize } from '@/lib/formatters'
 import { policyApi } from '../api/policyApi'
 import { claimApi } from '@/features/claims/api/claimApi'
 
@@ -98,6 +98,12 @@ export function PolicyDetailPage() {
           <dd className="mt-1">
             <StatusBadge status={policy.status} />
           </dd>
+        </div>
+        <div>
+          <dt className="text-[0.6875rem] font-semibold uppercase tracking-wider text-slate-500">
+            Renewal date
+          </dt>
+          <dd className="mt-1 text-sm text-slate-900">{formatDate(policy.renewalDate)}</dd>
         </div>
       </dl>
 

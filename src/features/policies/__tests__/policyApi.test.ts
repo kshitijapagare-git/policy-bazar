@@ -57,9 +57,11 @@ describe('policyApi', () => {
       type: 'auto',
       premium: 999.99,
       status: 'pending',
+      renewalDate: '2026-05-01',
     })
 
     expect(created.id).toBeGreaterThan(POLICY_SEED.length)
+    expect(created.renewalDate).toBe('2026-05-01')
 
     const result = await policyApi.list({ search: 'POL-2001' })
     expect(result.total).toBe(1)
@@ -72,10 +74,15 @@ describe('policyApi', () => {
       type: 'auto',
       premium: 1300,
       status: 'active',
+      renewalDate: '2026-02-01',
     })
 
     expect(updated.id).toBe(1)
-    await expect(policyApi.get(1)).resolves.toMatchObject({ holderName: 'Amelia Hart-Reyes' })
+    expect(updated.renewalDate).toBe('2026-02-01')
+    await expect(policyApi.get(1)).resolves.toMatchObject({
+      holderName: 'Amelia Hart-Reyes',
+      renewalDate: '2026-02-01',
+    })
   })
 
   it('removes a policy and rejects a second removal', async () => {

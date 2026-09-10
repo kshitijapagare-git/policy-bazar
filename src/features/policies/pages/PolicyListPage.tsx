@@ -18,7 +18,7 @@ import { useAsync } from '@/hooks/useAsync'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useListParams } from '@/hooks/useListParams'
 import { POLICY_STATUSES, POLICY_TYPES } from '@/lib/constants'
-import { formatCurrency, humanize } from '@/lib/formatters'
+import { formatCurrency, formatDate, humanize } from '@/lib/formatters'
 import { policyApi } from '../api/policyApi'
 import type { Policy } from '@/types'
 
@@ -89,6 +89,12 @@ export function PolicyListPage() {
         header: 'Status',
         sortable: true,
         render: (policy) => <StatusBadge status={policy.status} />,
+      },
+      {
+        key: 'renewalDate',
+        header: 'Renewal date',
+        sortable: true,
+        render: (policy) => formatDate(policy.renewalDate),
       },
     ],
     [],

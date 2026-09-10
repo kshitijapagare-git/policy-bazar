@@ -8,6 +8,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'auto',
     premium: 1240.5,
     status: 'active',
+    renewalDate: '2026-01-15',
   },
   {
     id: 2,
@@ -16,6 +17,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'home',
     premium: 2310,
     status: 'active',
+    renewalDate: '2026-02-20',
   },
   {
     id: 3,
@@ -24,6 +26,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'life',
     premium: 890.75,
     status: 'pending',
+    renewalDate: '2026-03-04',
   },
   {
     id: 4,
@@ -32,6 +35,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'health',
     premium: 3145.2,
     status: 'active',
+    renewalDate: '2026-04-11',
   },
   {
     id: 5,
@@ -40,6 +44,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'travel',
     premium: 210,
     status: 'lapsed',
+    renewalDate: '2025-12-01',
   },
   {
     id: 6,
@@ -48,6 +53,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'auto',
     premium: 1580.4,
     status: 'cancelled',
+    renewalDate: '2025-11-18',
   },
   {
     id: 7,
@@ -56,6 +62,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'home',
     premium: 1975.6,
     status: 'active',
+    renewalDate: '2026-05-09',
   },
   {
     id: 8,
@@ -64,6 +71,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'life',
     premium: 1120,
     status: 'pending',
+    renewalDate: '2026-06-22',
   },
   {
     id: 9,
@@ -72,6 +80,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'health',
     premium: 2680.35,
     status: 'active',
+    renewalDate: '2026-07-30',
   },
   {
     id: 10,
@@ -80,6 +89,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'travel',
     premium: 345.9,
     status: 'active',
+    renewalDate: '2026-08-14',
   },
   {
     id: 11,
@@ -88,6 +98,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'auto',
     premium: 1410.15,
     status: 'lapsed',
+    renewalDate: '2025-10-05',
   },
   {
     id: 12,
@@ -96,6 +107,7 @@ export const POLICY_SEED: readonly Policy[] = [
     type: 'home',
     premium: 2050,
     status: 'active',
+    renewalDate: '2026-09-27',
   },
 ]
 

@@ -21,6 +21,7 @@ describe('PolicyDetailPage', () => {
     expect(screen.getByText('Auto')).toBeInTheDocument()
     expect(screen.getByText('$1,240.50')).toBeInTheDocument()
     expect(screen.getByText('Active')).toBeInTheDocument()
+    expect(screen.getByText('Jan 15, 2026')).toBeInTheDocument()
   })
 
   it('lists the claims filed against the policy', async () => {

@@ -12,6 +12,7 @@ const EMPTY: PolicyInput = {
   type: '',
   premium: 0,
   status: '',
+  renewalDate: '',
 }
 
 function validate(values: PolicyInput): PolicyErrors {
@@ -21,6 +22,7 @@ function validate(values: PolicyInput): PolicyErrors {
   if (!values.holderName.trim()) errors.holderName = 'Holder name is required'
   if (!values.type) errors.type = 'Type is required'
   if (!values.status) errors.status = 'Status is required'
+  if (!values.renewalDate) errors.renewalDate = 'Renewal date is required'
 
   if (Number.isNaN(values.premium)) errors.premium = 'Premium is required'
   else if (values.premium <= 0) errors.premium = 'Premium must be greater than zero'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderRoute } from '@/test/utils'
 import { PolicyFormPage } from '../pages/PolicyFormPage'
@@ -39,6 +39,7 @@ describe('PolicyFormPage', () => {
     expect(screen.getByText('Type is required')).toBeInTheDocument()
     expect(screen.getByText('Status is required')).toBeInTheDocument()
     expect(screen.getByText('Premium must be greater than zero')).toBeInTheDocument()
+    expect(screen.getByText('Renewal date is required')).toBeInTheDocument()
 
     // Nothing was written to the store.
     await expect(policyApi.list({ pageSize: 50 })).resolves.toMatchObject({ total: 12 })
@@ -56,6 +57,18 @@ describe('PolicyFormPage', () => {
     expect(screen.queryByText('Holder name is required')).not.toBeInTheDocument()
   })
 
+  it('clears the renewal date error once a date is chosen', async () => {
+    const user = userEvent.setup()
+    renderCreate()
+
+    await user.click(screen.getByRole('button', { name: 'Create policy' }))
+    expect(await screen.findByText('Renewal date is required')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText(/Renewal date/), { target: { value: '2026-03-04' } })
+
+    expect(screen.queryByText('Renewal date is required')).not.toBeInTheDocument()
+  })
+
   it('creates a policy and navigates to its detail page', async () => {
     const user = userEvent.setup()
     renderCreate()
@@ -66,6 +79,7 @@ describe('PolicyFormPage', () => {
     await user.clear(screen.getByLabelText(/Premium/))
     await user.type(screen.getByLabelText(/Premium/), '1450.25')
     await user.selectOptions(screen.getByLabelText(/Status/), 'active')
+    fireEvent.change(screen.getByLabelText(/Renewal date/), { target: { value: '2026-03-04' } })
 
     await user.click(screen.getByRole('button', { name: 'Create policy' }))
 
@@ -79,6 +93,7 @@ describe('PolicyFormPage', () => {
       type: 'home',
       premium: 1450.25,
       status: 'active',
+      renewalDate: '2026-03-04',
     })
   })
 
@@ -91,6 +106,7 @@ describe('PolicyFormPage', () => {
     expect(screen.getByLabelText(/Policy number/)).toHaveValue('POL-1001')
     expect(screen.getByLabelText(/Holder name/)).toHaveValue('Amelia Hart')
     expect(screen.getByLabelText(/Premium/)).toHaveValue(1240.5)
+    expect(screen.getByLabelText(/Renewal date/)).toHaveValue('2026-01-15')
   })
 
   it('saves an edit without changing the id', async () => {
@@ -106,7 +122,11 @@ describe('PolicyFormPage', () => {
       expect(screen.getByTestId('location')).toHaveTextContent('/policies/1')
     })
 
-    await expect(policyApi.get(1)).resolves.toMatchObject({ id: 1, holderName: 'Amelia Reyes' })
+    await expect(policyApi.get(1)).resolves.toMatchObject({
+      id: 1,
+      holderName: 'Amelia Reyes',
+      renewalDate: '2026-01-15',
+    })
   })
 
   it('cancels back to the list', async () => {

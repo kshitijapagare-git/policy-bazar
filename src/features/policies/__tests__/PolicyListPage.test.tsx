@@ -16,6 +16,7 @@ describe('PolicyListPage', () => {
     expect(await screen.findByText('POL-1001')).toBeInTheDocument()
     expect(screen.getByText('Amelia Hart')).toBeInTheDocument()
     expect(screen.getByText('$1,240.50')).toBeInTheDocument()
+    expect(screen.getByText('Jan 15, 2026')).toBeInTheDocument()
 
     // Page size is 10, so the 11th and 12th seeds land on page two.
     expect(screen.queryByText('POL-1011')).not.toBeInTheDocument()

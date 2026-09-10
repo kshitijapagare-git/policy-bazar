@@ -83,6 +83,17 @@ export function PolicyFormFields({
           onChange={(event) => onChange('status', event.target.value)}
         />
       </FormField>
+
+      <FormField label="Renewal date" htmlFor="renewalDate" required error={errors.renewalDate}>
+        <Input
+          id="renewalDate"
+          type="date"
+          value={values.renewalDate}
+          disabled={disabled}
+          invalid={Boolean(errors.renewalDate)}
+          onChange={(event) => onChange('renewalDate', event.target.value)}
+        />
+      </FormField>
     </div>
   )
 }
