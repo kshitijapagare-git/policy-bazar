@@ -90,11 +90,11 @@ describe('claimApi', () => {
       policyId: 1,
       description: 'Rear-end collision on Route 9',
       amount: 3400,
-      status: 'paid',
+      status: 'settled',
     })
 
     expect(updated.id).toBe(1)
-    await expect(claimApi.get(1)).resolves.toMatchObject({ amount: 3400, status: 'paid' })
+    await expect(claimApi.get(1)).resolves.toMatchObject({ amount: 3400, status: 'settled' })
   })
 
   it('removes a claim and rejects a second removal', async () => {
@@ -110,5 +110,26 @@ describe('claimApi', () => {
 
     expect(claims.map((claim) => claim.claimNumber)).toEqual(['CLM-5001', 'CLM-5004'])
     await expect(claimApi.listByPolicy(6)).resolves.toEqual([])
+  })
+
+  it('transitions a claim to the next status', async () => {
+    const updated = await claimApi.transition(4, 'under_review')
+
+    expect(updated.status).toBe('under_review')
+    await expect(claimApi.get(4)).resolves.toMatchObject({ status: 'under_review' })
+  })
+
+  it('only touches the status field when transitioning', async () => {
+    const before = await claimApi.get(4)
+    const updated = await claimApi.transition(4, 'under_review')
+
+    expect(updated.claimNumber).toBe(before.claimNumber)
+    expect(updated.policyId).toBe(before.policyId)
+    expect(updated.description).toBe(before.description)
+    expect(updated.amount).toBe(before.amount)
+  })
+
+  it('rejects a transition for an unknown claim id', async () => {
+    await expect(claimApi.transition(9999, 'under_review')).rejects.toBeInstanceOf(ApiError)
   })
 })

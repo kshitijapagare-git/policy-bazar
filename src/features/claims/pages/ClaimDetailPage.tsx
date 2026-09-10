@@ -3,8 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button, ConfirmDialog, EmptyState, Spinner, StatusBadge } from '@/components/ui'
 import { useAsync } from '@/hooks/useAsync'
-import { formatCurrency } from '@/lib/formatters'
+import { formatCurrency, humanize } from '@/lib/formatters'
 import { claimApi } from '../api/claimApi'
+import { getAvailableTransitions } from '../lib/claimTransitions'
 import { policyApi } from '@/features/policies/api/policyApi'
 
 export function ClaimDetailPage() {
@@ -13,8 +14,10 @@ export function ClaimDetailPage() {
   const navigate = useNavigate()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [pendingTransition, setPendingTransition] = useState<string | null>(null)
+  const [transitioning, setTransitioning] = useState(false)
 
-  const { data: claim, loading, error } = useAsync(() => claimApi.get(claimId), [claimId])
+  const { data: claim, loading, error, reload } = useAsync(() => claimApi.get(claimId), [claimId])
   const { data: policy } = useAsync(
     () => (claim ? policyApi.get(claim.policyId) : Promise.resolve(null)),
     [claim?.policyId],
@@ -27,6 +30,18 @@ export function ClaimDetailPage() {
       navigate('/claims')
     } finally {
       setDeleting(false)
+    }
+  }
+
+  async function handleTransitionConfirm() {
+    if (!pendingTransition) return
+    setTransitioning(true)
+    try {
+      await claimApi.transition(claimId, pendingTransition)
+      reload()
+      setPendingTransition(null)
+    } finally {
+      setTransitioning(false)
     }
   }
 
@@ -52,6 +67,8 @@ export function ClaimDetailPage() {
     )
   }
 
+  const availableTransitions = getAvailableTransitions(claim.status)
+
   return (
     <>
       <PageHeader
@@ -59,6 +76,15 @@ export function ClaimDetailPage() {
         subtitle={formatCurrency(claim.amount)}
         actions={
           <>
+            {availableTransitions.map((nextStatus) => (
+              <Button
+                key={nextStatus}
+                variant="secondary"
+                onClick={() => setPendingTransition(nextStatus)}
+              >
+                Move to {humanize(nextStatus)}
+              </Button>
+            ))}
             <Button variant="secondary" onClick={() => navigate(`/claims/${claim.id}/edit`)}>
               Edit
             </Button>
@@ -115,6 +141,21 @@ export function ClaimDetailPage() {
         busy={deleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={pendingTransition !== null}
+        title="Update claim status"
+        message={
+          pendingTransition
+            ? `Move ${claim.claimNumber} to ${humanize(pendingTransition)}?`
+            : undefined
+        }
+        confirmLabel="Yes"
+        cancelLabel="No"
+        busy={transitioning}
+        onConfirm={handleTransitionConfirm}
+        onCancel={() => setPendingTransition(null)}
       />
     </>
   )

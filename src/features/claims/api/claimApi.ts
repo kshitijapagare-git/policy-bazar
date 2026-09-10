@@ -66,6 +66,21 @@ export const claimApi = {
     setClaimStore(store.filter((claim) => claim.id !== id))
   },
 
+  async transition(id: number, nextStatus: string): Promise<Claim> {
+    if (!USE_MOCK) return apiClient.patch<Claim>(`${RESOURCE}/${id}`, { status: nextStatus })
+
+    await mockDelay()
+    const store = getClaimStore()
+    const index = store.findIndex((claim) => claim.id === id)
+    if (index === -1) throw new ApiError(404, `Claim ${id} not found`)
+
+    const updated: Claim = { ...store[index], status: nextStatus }
+    const next = [...store]
+    next[index] = updated
+    setClaimStore(next)
+    return { ...updated }
+  },
+
   /** Claims belonging to one policy - used by the policy detail page. */
   async listByPolicy(policyId: number): Promise<Claim[]> {
     const { items } = await claimApi.list({

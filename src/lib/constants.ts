@@ -25,20 +25,22 @@ export const CLAIM_STATUSES: SelectOption[] = [
   { label: 'Under Review', value: 'under_review' },
   { label: 'Approved', value: 'approved' },
   { label: 'Rejected', value: 'rejected' },
-  { label: 'Paid', value: 'paid' },
+  { label: 'Settled', value: 'settled' },
+  { label: 'Closed', value: 'closed' },
 ]
 
 /** Drives the tone of <StatusBadge>. Anything unlisted falls back to neutral. */
 export const STATUS_TONES: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
   active: 'success',
   approved: 'success',
-  paid: 'success',
+  settled: 'success',
   pending: 'warning',
   submitted: 'info',
   under_review: 'warning',
   lapsed: 'neutral',
   cancelled: 'danger',
   rejected: 'danger',
+  closed: 'neutral',
 }
 
 export const NAV_ITEMS = [

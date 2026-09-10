@@ -23,7 +23,7 @@ export const CLAIM_SEED: readonly Claim[] = [
     policyId: 4,
     description: 'Emergency room visit and imaging',
     amount: 1480.25,
-    status: 'paid',
+    status: 'settled',
   },
   {
     id: 4,
@@ -79,7 +79,7 @@ export const CLAIM_SEED: readonly Claim[] = [
     policyId: 10,
     description: 'Trip cancellation due to illness',
     amount: 1275,
-    status: 'paid',
+    status: 'settled',
   },
   {
     id: 11,
