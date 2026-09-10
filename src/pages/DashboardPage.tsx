@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, Icon, Spinner, StatusBadge, type IconName } from '@/components/ui'
@@ -66,6 +67,14 @@ export function DashboardPage() {
       recentClaims: [...claims.items].sort((a, b) => b.id - a.id).slice(0, 5),
     }
   }, [])
+
+  const { data: policyOptions } = useAsync(() => policyApi.options(), [])
+
+  const policyLabels = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const option of policyOptions ?? []) map.set(option.value, option.label)
+    return map
+  }, [policyOptions])
 
   if (loading || !data) {
     return (
@@ -201,12 +210,20 @@ export function DashboardPage() {
               className="flex flex-col gap-2 px-4 py-3.5 transition-colors hover:bg-slate-50/70 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6"
             >
               <div className="min-w-0">
-                <Link
-                  to={`/claims/${claim.id}`}
-                  className="rounded text-sm font-medium text-sky-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                >
-                  {claim.claimNumber}
-                </Link>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <Link
+                    to={`/claims/${claim.id}`}
+                    className="rounded text-sm font-medium text-sky-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                  >
+                    {claim.claimNumber}
+                  </Link>
+                  <Link
+                    to={`/policies/${claim.policyId}`}
+                    className="rounded text-xs font-medium text-slate-500 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                  >
+                    {policyLabels.get(String(claim.policyId)) ?? `#${claim.policyId}`}
+                  </Link>
+                </div>
                 <p className="mt-0.5 truncate text-xs text-slate-500">{claim.description}</p>
               </div>
               <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end sm:gap-4">
